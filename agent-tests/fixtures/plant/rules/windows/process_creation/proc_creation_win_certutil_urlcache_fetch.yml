@@ -1,0 +1,26 @@
+title: Certutil Urlcache Fetch Of Remote File
+id: 9b0f4c2e-6a51-4f7e-9d2a-3c8e1f5b7a10
+status: experimental
+description: Detects certutil.exe fetching a remote file with urlcache.
+references:
+  - https://attack.mitre.org/techniques/T1105/
+author: Detection Engineering Team
+date: 2026-10-09
+tags:
+  - attack.command-and-control
+  - attack.t1105
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    Image|endswith: '\certutil.exe'
+    CommandLine|contains: '-urlcache '
+  selection_url:
+    CommandLine|contains: 'http'
+  filter_windows_update:
+    CommandLine|contains: 'WindowsUpdate'
+  condition: selection and selection_url and not filter_windows_update
+falsepositives:
+  - Windows Update components retrieving content
+level: high

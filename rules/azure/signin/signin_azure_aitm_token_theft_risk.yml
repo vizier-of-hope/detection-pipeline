@@ -1,0 +1,35 @@
+title: Entra ID Successful Sign-In With AiTM Token Theft Risk Detection
+id: 8ce8c3dc-0487-4de6-a634-db78144006c7
+status: experimental
+description: |
+  Detects a successful Entra ID sign-in that Identity Protection flagged with an anomalous-token
+  risk detection (anomalousToken / tokenIssuerAnomaly). These are the hallmarks of an
+  adversary-in-the-middle (AiTM) phishing proxy (Evilginx, EvilProxy) replaying a stolen session
+  cookie / token to bypass MFA, since the interactive authentication itself looks legitimate.
+references:
+  - https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks
+  - https://attack.mitre.org/techniques/T1557/
+  - https://attack.mitre.org/techniques/T1539/
+author: Detection Engineering Team
+date: 2026-10-09
+tags:
+  - attack.credential-access
+  - attack.t1557
+  - attack.t1539
+logsource:
+  product: azure
+  service: signinlogs
+detection:
+  selection_success:
+    ResultType: 0
+  selection_risk:
+    - RiskEventTypes_V2|contains:
+        - 'anomalousToken'
+        - 'tokenIssuerAnomaly'
+    - RiskEventTypes|contains:
+        - 'anomalousToken'
+        - 'tokenIssuerAnomaly'
+  condition: all of selection_*
+falsepositives:
+  - Rare benign token anomalies; corroborate with the user's other sign-ins and mailbox-rule changes
+level: high

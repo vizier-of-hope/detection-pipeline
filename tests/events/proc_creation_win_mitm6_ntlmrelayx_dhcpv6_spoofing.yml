@@ -1,0 +1,36 @@
+rule_id: df40c7d9-e433-4f93-bc33-7dc13a9ecfec
+true_positives:
+  - name: compiled mitm6.exe DHCPv6 spoofing
+    event:
+      Image: 'C:\Tools\mitm6.exe'
+      OriginalFileName: mitm6.exe
+      CommandLine: 'mitm6.exe -d corp.local'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+  - name: mitm6 run via Python module
+    event:
+      Image: 'C:\Python311\python.exe'
+      CommandLine: 'python.exe C:\tools\mitm6\mitm6.py -d corp.local -i Ethernet0'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+  - name: ntlmrelayx IPv6 relay (renamed binary via OriginalFileName)
+    event:
+      Image: 'C:\Users\Public\relay.exe'
+      OriginalFileName: ntlmrelayx.exe
+      CommandLine: 'relay.exe -6 -t ldaps://dc01.corp.local -wh attacker-wpad --delegate-access'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+true_negatives:
+  - name: unrelated Python application
+    event:
+      Image: 'C:\Python311\python.exe'
+      CommandLine: 'python.exe app.py --workers 6'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: routine ipconfig
+    event:
+      Image: 'C:\Windows\System32\cmd.exe'
+      CommandLine: 'ipconfig /all'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: mitmproxy (similar name, not mitm6)
+    event:
+      Image: 'C:\Program Files\mitmproxy\mitmproxy.exe'
+      OriginalFileName: mitmproxy.exe
+      CommandLine: 'mitmproxy.exe --listen-port 8080'
+      ParentImage: 'C:\Windows\explorer.exe'

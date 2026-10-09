@@ -1,0 +1,32 @@
+title: Certutil Used To Download Remote File
+id: 5f23f0aa-850c-44e8-a31d-7595ff0df60a
+status: stable
+description: Detects certutil.exe used with urlcache or verifyctl to fetch a file from a remote URL (ingress tool transfer).
+references:
+  - https://attack.mitre.org/techniques/T1105/
+  - https://lolbas-project.github.io/lolbas/Binaries/Certutil/
+author: Detection Engineering Team
+date: 2026-10-08
+tags:
+  - attack.command-and-control
+  - attack.t1105
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    - Image|endswith: '\certutil.exe'
+    - OriginalFileName: 'CertUtil.exe'
+  selection_verb:
+    CommandLine|contains|windash:
+      - '-urlcache '
+      - '-verifyctl '
+  selection_url:
+    CommandLine|contains:
+      - 'http://'
+      - 'https://'
+      - 'ftp://'
+  condition: all of selection_*
+falsepositives:
+  - Administrators manually retrieving certificate revocation lists
+level: high

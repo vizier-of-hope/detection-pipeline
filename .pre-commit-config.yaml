@@ -1,0 +1,27 @@
+# Same gates as CI, run locally before each commit: `pip install pre-commit && pre-commit install`
+repos:
+  - repo: local
+    hooks:
+      - id: yamllint
+        name: yamllint
+        entry: yamllint -s
+        language: system
+        files: ^(rules|tests/events)/.*\.ya?ml$
+      - id: sigma-check
+        name: sigma check
+        entry: sigma check --fail-on-issues rules
+        language: system
+        pass_filenames: false
+        files: ^rules/
+      - id: rule-policy
+        name: rule policy
+        entry: python -m dettools.validate
+        language: system
+        pass_filenames: false
+        files: ^(rules|tests/events)/
+      - id: rule-tests
+        name: rule unit tests
+        entry: pytest -q
+        language: system
+        pass_filenames: false
+        files: ^(rules|tests|dettools)/

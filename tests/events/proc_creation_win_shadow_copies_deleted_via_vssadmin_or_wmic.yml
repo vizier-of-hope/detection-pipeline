@@ -1,0 +1,28 @@
+rule_id: 6ab6665b-9df5-45f2-90a4-f58f3d77a575
+true_positives:
+  - name: vssadmin delete all quietly
+    event:
+      Image: 'C:\Windows\System32\vssadmin.exe'
+      CommandLine: 'vssadmin.exe Delete Shadows /All /Quiet'
+  - name: renamed vssadmin resize shadowstorage
+    event:
+      Image: 'C:\Users\Public\v.exe'
+      OriginalFileName: 'VSSADMIN.EXE'
+      CommandLine: 'v.exe resize shadowstorage /for=c: /on=c: /maxsize=401MB'
+  - name: wmic shadowcopy delete
+    event:
+      Image: 'C:\Windows\System32\wbem\WMIC.exe'
+      CommandLine: 'wmic SHADOWCOPY DELETE /nointeractive'
+true_negatives:
+  - name: vssadmin listing shadows
+    event:
+      Image: 'C:\Windows\System32\vssadmin.exe'
+      CommandLine: 'vssadmin list shadows'
+  - name: wmic shadowcopy listing
+    event:
+      Image: 'C:\Windows\System32\wbem\WMIC.exe'
+      CommandLine: 'wmic shadowcopy list brief'
+  - name: unrelated binary mentioning delete shadows
+    event:
+      Image: 'C:\Windows\System32\notepad.exe'
+      CommandLine: 'notepad.exe C:\notes\how-to-delete-shadows.txt'

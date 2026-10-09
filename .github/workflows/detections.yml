@@ -1,0 +1,165 @@
+name: Detection CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "rules/**"
+      - "tests/**"
+      - "dettools/**"
+      - "requirements.txt"
+      - ".github/workflows/detections.yml"
+  push:
+    branches: [main]
+    paths:
+      - "rules/**"
+      - "tests/**"
+      - "dettools/**"
+      - "requirements.txt"
+      - ".github/workflows/detections.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never run two deployments at once; a newer push supersedes a queued one.
+concurrency:
+  group: detections-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  lint:
+    name: Lint YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: yamllint -s -f github rules tests/events
+
+  validate:
+    name: Validate rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Sigma specification + ATT&CK checks
+        run: sigma check --fail-on-issues rules
+      - name: Team rule policy (metadata, unique ids, test fixtures)
+        run: python -m dettools.validate
+
+  test:
+    name: Unit-test rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pytest -q --junitxml=reports/junit.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: reports/junit.xml
+
+  build:
+    name: Convert to SIEM queries
+    needs: [lint, validate, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m dettools.convert
+      - name: Job summary
+        run: |
+          python - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          rules = json.load(open("build/manifest.json"))
+          print("## Compiled detections\n")
+          print("| Rule | Status | Level | Ships to prod |")
+          print("|---|---|---|---|")
+          for r in rules:
+              ships = "yes" if r["status"] in ("test", "stable") else "no (experimental)"
+              print(f"| {r['title']} | {r['status']} | {r['level']} | {ships} |")
+          EOF
+          echo >> "$GITHUB_STEP_SUMMARY"
+          cat build/coverage.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy dry-run
+        run: python -m dettools.deploy --target all --min-status test --dry-run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: detections-build
+          path: build/
+          retention-days: 30
+
+  # Staging gets everything, including experimental rules, so they can be tuned on real data.
+  deploy-staging:
+    name: Deploy to staging
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: detections-build
+          path: build/
+      - name: Deploy
+        run: python -m dettools.deploy --target ${{ vars.DEPLOY_TARGET || 'all' }} --min-status experimental
+        env:
+          SPLUNK_URL: ${{ secrets.SPLUNK_URL }}
+          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
+          SPLUNK_APP: ${{ vars.SPLUNK_APP }}
+          KIBANA_URL: ${{ secrets.KIBANA_URL }}
+          KIBANA_API_KEY: ${{ secrets.KIBANA_API_KEY }}
+          KIBANA_SPACE: ${{ vars.KIBANA_SPACE }}
+
+  # Production only gets test/stable rules, and waits for an approver on the 'production' environment.
+  deploy-production:
+    name: Deploy to production
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: detections-build
+          path: build/
+      - name: Deploy
+        run: python -m dettools.deploy --target ${{ vars.DEPLOY_TARGET || 'all' }} --min-status test
+        env:
+          SPLUNK_URL: ${{ secrets.SPLUNK_URL }}
+          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
+          SPLUNK_APP: ${{ vars.SPLUNK_APP }}
+          KIBANA_URL: ${{ secrets.KIBANA_URL }}
+          KIBANA_API_KEY: ${{ secrets.KIBANA_API_KEY }}
+          KIBANA_SPACE: ${{ vars.KIBANA_SPACE }}

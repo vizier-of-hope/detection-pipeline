@@ -1,0 +1,19 @@
+rule_id: 1c4f8144-55a1-4bd3-89e6-8080f948f457
+true_positives:
+  - name: classic MiniDump export
+    event:
+      Image: 'C:\Windows\System32\rundll32.exe'
+      CommandLine: 'rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump 624 C:\temp\lsass.dmp full'
+  - name: ordinal export
+    event:
+      Image: 'C:\Windows\System32\rundll32.exe'
+      CommandLine: 'rundll32 comsvcs.dll #24 624 C:\temp\out.bin full'
+true_negatives:
+  - name: unrelated rundll32
+    event:
+      Image: 'C:\Windows\System32\rundll32.exe'
+      CommandLine: 'rundll32.exe shell32.dll,Control_RunDLL desk.cpl'
+  - name: comsvcs loaded without minidump
+    event:
+      Image: 'C:\Windows\System32\rundll32.exe'
+      CommandLine: 'rundll32.exe comsvcs.dll,DllRegisterServer'

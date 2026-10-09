@@ -1,0 +1,39 @@
+title: PowerShell Execution With Encoded Command
+id: ff57a278-658e-4550-9d5d-c4c09d158186
+status: test
+description: |
+  Detects PowerShell launched with an encoded command argument (-EncodedCommand and
+  its abbreviations). Attackers use encoding to hide script content from casual review.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+author: Detection Engineering Team
+date: 2026-10-08
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.stealth
+  - attack.t1027
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    - Image|endswith:
+        - '\powershell.exe'
+        - '\pwsh.exe'
+    - OriginalFileName:
+        - 'PowerShell.EXE'
+        - 'pwsh.dll'
+  selection_flag:
+    CommandLine|contains|windash:
+      - ' -e '
+      - ' -en '
+      - ' -enc '
+      - ' -enco'
+      - ' -ec '
+  filter_main_sccm:
+    ParentImage|endswith: '\CCM\CcmExec.exe'
+  condition: all of selection_* and not 1 of filter_main_*
+falsepositives:
+  - Software management agents that wrap scripts in encoded commands
+level: medium

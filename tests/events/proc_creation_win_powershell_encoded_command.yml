@@ -1,0 +1,35 @@
+rule_id: ff57a278-658e-4550-9d5d-c4c09d158186
+true_positives:
+  - name: powershell -enc
+    event:
+      Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+      OriginalFileName: PowerShell.EXE
+      CommandLine: 'powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: pwsh with slash-style flag (windash)
+    event:
+      Image: 'C:\Program Files\PowerShell\7\pwsh.exe'
+      CommandLine: 'pwsh /ec SQBFAFgA'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+  - name: renamed binary caught by OriginalFileName
+    event:
+      Image: 'C:\Users\Public\update.exe'
+      OriginalFileName: PowerShell.EXE
+      CommandLine: 'update.exe -EncodedCommand SQBFAFgA'
+      ParentImage: 'C:\Windows\System32\wscript.exe'
+true_negatives:
+  - name: plain powershell script
+    event:
+      Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+      CommandLine: 'powershell.exe -File C:\scripts\backup.ps1'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: SCCM agent (filtered)
+    event:
+      Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+      CommandLine: 'powershell.exe -enc SQBFAFgA'
+      ParentImage: 'C:\Windows\CCM\CcmExec.exe'
+  - name: -enc on non-powershell binary
+    event:
+      Image: 'C:\Tools\ffmpeg.exe'
+      CommandLine: 'ffmpeg.exe -i in.mp4 -enc libx264 out.mp4'
+      ParentImage: 'C:\Windows\explorer.exe'

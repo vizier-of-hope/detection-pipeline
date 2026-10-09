@@ -1,0 +1,37 @@
+title: mitm6 Or ntlmrelayx DHCPv6 Spoofing And NTLM Relay Tooling
+id: df40c7d9-e433-4f93-bc33-7dc13a9ecfec
+status: experimental
+description: |
+  Detects execution of mitm6 (rogue DHCPv6 / DNS takeover for IPv6-based adversary-in-the-middle)
+  and ntlmrelayx (Impacket NTLM relay), the standard chain used to coerce and relay NetNTLM
+  authentication. Matches the compiled binaries (including when renamed, via OriginalFileName)
+  and Python/command-line invocations of either tool.
+references:
+  - https://github.com/dirkjanm/mitm6
+  - https://attack.mitre.org/techniques/T1557/003/
+author: Detection Engineering Team
+date: 2026-10-09
+tags:
+  - attack.credential-access
+  - attack.t1557.001
+  - attack.t1557.003
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_binary:
+    - Image|endswith:
+        - '\mitm6.exe'
+        - '\ntlmrelayx.exe'
+    - OriginalFileName:
+        - 'mitm6.exe'
+        - 'ntlmrelayx.exe'
+  selection_cmdline:
+    CommandLine|contains:
+      - 'mitm6.py'
+      - 'mitm6.exe'
+      - 'ntlmrelayx'
+  condition: 1 of selection_*
+falsepositives:
+  - Authorized red-team or penetration-testing engagements running mitm6 or ntlmrelayx
+level: high

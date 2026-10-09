@@ -1,0 +1,47 @@
+rule_id: 8ce8c3dc-0487-4de6-a634-db78144006c7
+true_positives:
+  - name: successful sign-in flagged anomalousToken
+    event:
+      ResultType: 0
+      RiskEventTypes_V2:
+        - anomalousToken
+      RiskState: atRisk
+      AppDisplayName: 'Office 365 Exchange Online'
+      UserPrincipalName: 'alice@corp.com'
+      IPAddress: '91.107.156.29'
+  - name: successful sign-in flagged tokenIssuerAnomaly
+    event:
+      ResultType: 0
+      RiskEventTypes_V2:
+        - tokenIssuerAnomaly
+      RiskLevelDuringSignIn: high
+      UserPrincipalName: 'bob@corp.com'
+      IPAddress: '65.109.214.145'
+  - name: legacy RiskEventTypes column carries the anomalous token detection
+    event:
+      ResultType: 0
+      RiskEventTypes: 'anomalousToken'
+      UserPrincipalName: 'carol@corp.com'
+      IPAddress: '38.180.136.127'
+true_negatives:
+  - name: successful sign-in with no risk detection
+    event:
+      ResultType: 0
+      RiskEventTypes_V2:
+        - none
+      UserPrincipalName: 'dave@corp.com'
+      IPAddress: '203.0.113.50'
+  - name: failed sign-in (wrong password) despite token anomaly
+    event:
+      ResultType: 50126
+      RiskEventTypes_V2:
+        - anomalousToken
+      UserPrincipalName: 'erin@corp.com'
+      IPAddress: '198.51.100.7'
+  - name: successful sign-in with an unrelated risk type
+    event:
+      ResultType: 0
+      RiskEventTypes_V2:
+        - unfamiliarFeatures
+      UserPrincipalName: 'frank@corp.com'
+      IPAddress: '203.0.113.88'

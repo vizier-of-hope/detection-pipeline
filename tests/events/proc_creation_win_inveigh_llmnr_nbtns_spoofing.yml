@@ -1,0 +1,35 @@
+rule_id: 5d3e5e72-d0e0-458e-aa60-d8d71898a9cd
+true_positives:
+  - name: PowerShell Invoke-Inveigh with LLMNR/NBNS spoofing
+    event:
+      Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+      OriginalFileName: PowerShell.EXE
+      CommandLine: 'powershell.exe -ep bypass -c Invoke-Inveigh -ConsoleOutput Y -LLMNR Y -NBNS Y'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+  - name: compiled Inveigh.exe (C# port)
+    event:
+      Image: 'C:\Tools\Inveigh.exe'
+      OriginalFileName: Inveigh.exe
+      CommandLine: 'Inveigh.exe -LLMNR Y -NBNS Y -mDNS Y'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: renamed binary caught by spoofer parameter combination
+    event:
+      Image: 'C:\Users\Public\svchost.exe'
+      CommandLine: 'svchost.exe -SpooferIP 10.0.0.5 -LLMNR Y -NBNS Y'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+true_negatives:
+  - name: plain PowerShell inventory script
+    event:
+      Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+      CommandLine: 'powershell.exe -File C:\scripts\inventory.ps1'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: DNS client admin command (no Inveigh tokens)
+    event:
+      Image: 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+      CommandLine: 'powershell.exe -c Get-DnsClientGlobalSetting'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: single LLMNR flag only, no SpooferIP (must not trip the param combo)
+    event:
+      Image: 'C:\Windows\System32\netsh.exe'
+      CommandLine: 'netsh interface ipv4 set dnsservers name="LAN" -LLMNR'
+      ParentImage: 'C:\Windows\System32\cmd.exe'

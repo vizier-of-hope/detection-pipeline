@@ -1,0 +1,13 @@
+pySigma==1.5.1
+sigma-cli==3.1.0
+pysigma-backend-splunk==2.1.0
+pySigma-backend-elasticsearch==2.1.1
+pysigma-pipeline-sysmon==2.0.0
+pysigma-pipeline-windows==2.0.1
+pySigma-backend-kusto==1.0.1
+pysigma-backend-crowdstrike==3.0.0
+pySigma-backend-secops==1.0.0
+PyYAML>=6.0
+requests==2.34.2
+pytest==9.1.1
+yamllint==1.38.0

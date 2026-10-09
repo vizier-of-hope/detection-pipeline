@@ -1,0 +1,33 @@
+title: Inveigh LLMNR NBT-NS mDNS Spoofing Tool Execution
+id: 5d3e5e72-d0e0-458e-aa60-d8d71898a9cd
+status: experimental
+description: |
+  Detects execution of Inveigh, a PowerShell/.NET LLMNR, NBT-NS and mDNS spoofer used to
+  perform on-network adversary-in-the-middle name-resolution poisoning and capture NetNTLM
+  credentials. Matches the PowerShell function, the compiled binary (including when renamed,
+  via OriginalFileName) and the characteristic spoofer parameter combination.
+references:
+  - https://github.com/Kevin-Robertson/Inveigh
+  - https://attack.mitre.org/techniques/T1557/001/
+author: Detection Engineering Team
+date: 2026-10-09
+tags:
+  - attack.credential-access
+  - attack.t1557.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_cmdlet:
+    CommandLine|contains: 'Invoke-Inveigh'
+  selection_binary:
+    - Image|endswith: '\Inveigh.exe'
+    - OriginalFileName: 'Inveigh.exe'
+  selection_params:
+    CommandLine|contains|all:
+      - '-SpooferIP'
+      - '-LLMNR'
+  condition: 1 of selection_*
+falsepositives:
+  - Authorized red-team or penetration-testing engagements running Inveigh
+level: high

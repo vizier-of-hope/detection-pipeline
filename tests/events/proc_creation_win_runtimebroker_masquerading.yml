@@ -1,0 +1,35 @@
+rule_id: f795ebd8-1de5-4767-b7c8-72cc21e50982
+true_positives:
+  - name: Blinder Tunnel loader in LOCALAPPDATA RuntimeBrokers folder
+    event:
+      Image: 'C:\Users\jdoe\AppData\Local\Microsoft\RuntimeBrokers\RuntimeBroker.exe'
+      OriginalFileName: vshost.exe
+      CommandLine: 'RuntimeBroker.exe'
+      ParentImage: 'C:\Windows\explorer.exe'
+  - name: masqueraded RuntimeBroker launched from ProgramData
+    event:
+      Image: 'C:\ProgramData\RuntimeBroker.exe'
+      CommandLine: 'C:\ProgramData\RuntimeBroker.exe'
+      ParentImage: 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe'
+  - name: RuntimeBroker dropped in a user temp directory
+    event:
+      Image: 'C:\Users\Public\Downloads\RuntimeBroker.exe'
+      CommandLine: 'RuntimeBroker.exe -q'
+      ParentImage: 'C:\Windows\System32\cmd.exe'
+true_negatives:
+  - name: legitimate COM surrogate from System32
+    event:
+      Image: 'C:\Windows\System32\RuntimeBroker.exe'
+      OriginalFileName: RuntimeBroker.exe
+      CommandLine: 'C:\Windows\System32\RuntimeBroker.exe -Embedding'
+      ParentImage: 'C:\Windows\System32\svchost.exe'
+  - name: legitimate COM surrogate with mixed-case path
+    event:
+      Image: 'C:\Windows\system32\runtimebroker.exe'
+      CommandLine: 'runtimebroker.exe -Embedding'
+      ParentImage: 'C:\Windows\System32\svchost.exe'
+  - name: unrelated binary in LOCALAPPDATA (different image name)
+    event:
+      Image: 'C:\Users\jdoe\AppData\Local\Microsoft\OneDrive\OneDrive.exe'
+      CommandLine: 'OneDrive.exe /background'
+      ParentImage: 'C:\Windows\explorer.exe'
