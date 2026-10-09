@@ -1,0 +1,49 @@
+rule_id: 048d4e9a-6a64-4ce3-a286-89254678f5f2
+true_positives:
+  - name: IAM user stops the organisation trail
+    event:
+      eventVersion: '1.09'
+      eventSource: cloudtrail.amazonaws.com
+      eventName: StopLogging
+      awsRegion: ap-southeast-1
+      sourceIPAddress: 185.220.101.4
+      userIdentity:
+        type: IAMUser
+        userName: svc-backup
+        arn: 'arn:aws:iam::111122223333:user/svc-backup'
+      requestParameters:
+        name: 'arn:aws:cloudtrail:ap-southeast-1:111122223333:trail/org-trail'
+  - name: assumed role deletes a trail
+    event:
+      eventSource: cloudtrail.amazonaws.com
+      eventName: DeleteTrail
+      userIdentity:
+        type: AssumedRole
+        arn: 'arn:aws:sts::111122223333:assumed-role/dev-admin/attacker-session'
+  - name: denied StopLogging attempt is still reported
+    event:
+      eventSource: cloudtrail.amazonaws.com
+      eventName: StopLogging
+      errorCode: AccessDenied
+      userIdentity:
+        type: IAMUser
+        userName: intern
+true_negatives:
+  - name: routine trail status read
+    event:
+      eventSource: cloudtrail.amazonaws.com
+      eventName: GetTrailStatus
+      userIdentity:
+        type: IAMUser
+        userName: auditor
+  - name: logging switched back on
+    event:
+      eventSource: cloudtrail.amazonaws.com
+      eventName: StartLogging
+      userIdentity:
+        type: IAMUser
+        userName: secops
+  - name: same API name from a different service is ignored
+    event:
+      eventSource: logs.amazonaws.com
+      eventName: DeleteTrail

@@ -37,6 +37,8 @@ from sigma.pipelines.secops import secops_udm_pipeline
 from sigma.pipelines.sentinelasim import sentinel_asim_pipeline
 from sigma.pipelines.splunk import splunk_cim_data_model, splunk_windows_pipeline
 from sigma.pipelines.sysmon import sysmon_pipeline
+from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
+from sigma.processing.transformations import AddConditionTransformation, FieldMappingTransformation
 from sigma.rule import SigmaRule
 
 
@@ -48,6 +50,50 @@ def endpoint_logsource(rule: SigmaRule) -> bool:
 def signin_logsource(rule: SigmaRule) -> bool:
     """Entra ID / Azure AD interactive and non-interactive sign-in logs."""
     return (rule.logsource.service or "").lower() == "signinlogs"
+
+
+def cloudtrail_logsource(rule: SigmaRule) -> bool:
+    """AWS CloudTrail management events. Rules use CloudTrail's own JSON field names."""
+    return (rule.logsource.product or "").lower() == "aws" and (rule.logsource.service or "").lower() == "cloudtrail"
+
+
+# CloudTrail JSON field -> Sentinel AWSCloudTrail column (AWS S3 connector).
+SENTINEL_CLOUDTRAIL_FIELDS = {
+    "eventSource": "EventSource",
+    "eventName": "EventName",
+    "eventType": "EventTypeName",
+    "errorCode": "ErrorCode",
+    "awsRegion": "AWSRegion",
+    "sourceIPAddress": "SourceIpAddress",
+    "userAgent": "UserAgent",
+    "recipientAccountId": "RecipientAccountId",
+    "userIdentity.type": "UserIdentityType",
+    "userIdentity.arn": "UserIdentityArn",
+    "userIdentity.userName": "UserIdentityUserName",
+    "userIdentity.accountId": "UserIdentityAccountId",
+    "userIdentity.invokedBy": "UserIdentityInvokedBy",
+}
+
+# CloudTrail JSON field -> ECS field written by the Elastic AWS integration (aws.cloudtrail dataset).
+ELASTIC_CLOUDTRAIL_FIELDS = {
+    "eventSource": "event.provider",
+    "eventName": "event.action",
+    "eventType": "aws.cloudtrail.event_type",
+    "errorCode": "aws.cloudtrail.error_code",
+    "awsRegion": "cloud.region",
+    "sourceIPAddress": "source.address",
+    "userAgent": "user_agent.original",
+    "recipientAccountId": "aws.cloudtrail.recipient_account_id",
+    "userIdentity.type": "aws.cloudtrail.user_identity.type",
+    "userIdentity.arn": "aws.cloudtrail.user_identity.arn",
+    "userIdentity.userName": "user.name",
+    "userIdentity.accountId": "cloud.account.id",
+    "userIdentity.invokedBy": "aws.cloudtrail.user_identity.invoked_by",
+}
+
+
+def _pipeline(*transformations) -> ProcessingPipeline:
+    return ProcessingPipeline(name="cloudtrail", priority=10, items=[ProcessingItem(t) for t in transformations])
 
 
 @dataclass(frozen=True)
@@ -158,6 +204,31 @@ TARGETS: dict[str, Target] = {t.key: t for t in [
         ext="kql", required=True, and_binds_tighter=True, applies_to=signin_logsource,
         caveat="Entra ID SigninLogs columns (ResultType, IPAddress, AppDisplayName...). Needs the"
                " Azure Active Directory / Entra ID connector feeding SigninLogs into Sentinel.",
+    ),
+    Target(
+        "splunk_cloudtrail", "Splunk (AWS CloudTrail)", "SPL",
+        lambda: SplunkBackend(_pipeline(AddConditionTransformation({"sourcetype": "aws:cloudtrail"}))),
+        ext="spl", required=True, and_binds_tighter=False, applies_to=cloudtrail_logsource,
+        caveat="Splunk Add-on for AWS (sourcetype aws:cloudtrail), which keeps CloudTrail's JSON field names.",
+    ),
+    Target(
+        "sentinel_cloudtrail", "Microsoft Sentinel (AWS CloudTrail)", "KQL",
+        lambda: KustoBackend(
+            _pipeline(FieldMappingTransformation(SENTINEL_CLOUDTRAIL_FIELDS))
+            + azure_monitor_pipeline(query_table="AWSCloudTrail")
+        ),
+        ext="kql", required=True, and_binds_tighter=True, applies_to=cloudtrail_logsource,
+        caveat="AWSCloudTrail table from the Amazon Web Services S3 connector. Only top-level and"
+               " userIdentity fields are mapped; requestParameters/responseElements are JSON strings there.",
+    ),
+    Target(
+        "elastic_cloudtrail", "Elastic Security (AWS CloudTrail)", "Lucene",
+        lambda: LuceneBackend(_pipeline(
+            FieldMappingTransformation(ELASTIC_CLOUDTRAIL_FIELDS),
+            AddConditionTransformation({"event.dataset": "aws.cloudtrail"}),
+        )),
+        ext="lucene", and_binds_tighter=True, applies_to=cloudtrail_logsource,
+        caveat="ECS fields from the Elastic AWS integration (event.dataset aws.cloudtrail).",
     ),
 ]}
 

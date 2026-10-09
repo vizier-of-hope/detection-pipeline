@@ -1,0 +1,39 @@
+rule_id: 16fa06b9-5d7e-41e6-aa55-6c920e1c4744
+true_positives:
+  - name: root console sign-in
+    event:
+      eventSource: signin.amazonaws.com
+      eventName: ConsoleLogin
+      eventType: AwsConsoleSignIn
+      sourceIPAddress: 45.137.21.9
+      userIdentity:
+        type: Root
+        arn: 'arn:aws:iam::111122223333:root'
+        accountId: '111122223333'
+      responseElements:
+        ConsoleLogin: Success
+  - name: root creates an access key
+    event:
+      eventSource: iam.amazonaws.com
+      eventName: CreateAccessKey
+      eventType: AwsApiCall
+      userIdentity:
+        type: Root
+        arn: 'arn:aws:iam::111122223333:root'
+true_negatives:
+  - name: AWS service event attributed to root
+    event:
+      eventSource: sts.amazonaws.com
+      eventName: AssumeRole
+      eventType: AwsServiceEvent
+      userIdentity:
+        type: Root
+        invokedBy: 'config.amazonaws.com'
+  - name: IAM user making the same call
+    event:
+      eventSource: iam.amazonaws.com
+      eventName: CreateAccessKey
+      eventType: AwsApiCall
+      userIdentity:
+        type: IAMUser
+        userName: alice

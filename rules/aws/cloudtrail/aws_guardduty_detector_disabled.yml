@@ -1,0 +1,30 @@
+title: AWS GuardDuty Detector Deleted Or Account Detached
+id: 6c4d5585-090b-41ef-a59e-82e52555d38c
+status: experimental
+description: |
+  Detects GuardDuty being switched off in an account: the detector deleted, the member account
+  detached from its administrator, or monitoring of member accounts stopped. Each of these hides
+  threats GuardDuty would otherwise raise, and they rarely happen outside a planned change.
+references:
+  - https://docs.aws.amazon.com/guardduty/latest/APIReference/API_DeleteDetector.html
+  - https://attack.mitre.org/techniques/T1685/
+author: Lim Yong An
+date: 2026-10-09
+tags:
+  - attack.defense-impairment
+  - attack.t1685
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection:
+    eventSource: guardduty.amazonaws.com
+    eventName:
+      - DeleteDetector
+      - DisassociateFromAdministratorAccount
+      - DisassociateFromMasterAccount
+      - StopMonitoringMembers
+  condition: selection
+falsepositives:
+  - Planned changes to the GuardDuty organisation setup; confirm against a change ticket
+level: high

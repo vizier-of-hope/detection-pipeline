@@ -1,0 +1,36 @@
+rule_id: 6c4d5585-090b-41ef-a59e-82e52555d38c
+true_positives:
+  - name: detector deleted in the member account
+    event:
+      eventSource: guardduty.amazonaws.com
+      eventName: DeleteDetector
+      awsRegion: ap-southeast-1
+      userIdentity:
+        type: AssumedRole
+        arn: 'arn:aws:sts::111122223333:assumed-role/ci-deployer/i-0abc'
+      requestParameters:
+        detectorId: 12abc34d567e8fa901bc2d34e56789f0
+  - name: member detaches itself from the delegated administrator
+    event:
+      eventSource: guardduty.amazonaws.com
+      eventName: DisassociateFromAdministratorAccount
+      userIdentity:
+        type: IAMUser
+        userName: legacy-admin
+  - name: legacy API name for the same detach
+    event:
+      eventSource: guardduty.amazonaws.com
+      eventName: DisassociateFromMasterAccount
+  - name: administrator stops monitoring member accounts
+    event:
+      eventSource: guardduty.amazonaws.com
+      eventName: StopMonitoringMembers
+true_negatives:
+  - name: findings listed by the SOC
+    event:
+      eventSource: guardduty.amazonaws.com
+      eventName: ListFindings
+  - name: new detector created
+    event:
+      eventSource: guardduty.amazonaws.com
+      eventName: CreateDetector

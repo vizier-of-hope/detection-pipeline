@@ -6,23 +6,23 @@ Generated from the pinned pySigma pipelines (see `dettools/targets.py`). `—` m
 pipeline rejects the field (or the whole logsource) for that target, so a rule using it
 will be a coverage gap there. Pick fields that every SIEM you deploy to supports.
 
-Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elastic_lucene` = Elastic Security Lucene, `elastic_eql` = Elastic Security EQL, `elastic_esql` = Elastic Security ES|QL, `microsoft_xdr` = Microsoft Defender XDR / Sentinel KQL, `sentinel_asim` = Microsoft Sentinel (ASIM) KQL, `crowdstrike_logscale` = CrowdStrike Falcon / LogScale CQL (LogScale), `secops_udm` = Google SecOps (Chronicle) UDM search, `secops_yaral` = Google SecOps (Chronicle) YARA-L 2.0, `sentinel_signin` = Microsoft Sentinel (Entra sign-in) KQL
+Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elastic_lucene` = Elastic Security Lucene, `elastic_eql` = Elastic Security EQL, `elastic_esql` = Elastic Security ES|QL, `microsoft_xdr` = Microsoft Defender XDR / Sentinel KQL, `sentinel_asim` = Microsoft Sentinel (ASIM) KQL, `crowdstrike_logscale` = CrowdStrike Falcon / LogScale CQL (LogScale), `secops_udm` = Google SecOps (Chronicle) UDM search, `secops_yaral` = Google SecOps (Chronicle) YARA-L 2.0, `sentinel_signin` = Microsoft Sentinel (Entra sign-in) KQL, `splunk_cloudtrail` = Splunk (AWS CloudTrail) SPL, `sentinel_cloudtrail` = Microsoft Sentinel (AWS CloudTrail) KQL, `elastic_cloudtrail` = Elastic Security (AWS CloudTrail) Lucene
 
 ## process_creation (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | `Processes.process_path` | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `FolderPath` | `TargetProcessName` | `ImageFileName` | `target.process.file.full_path` | `target.process.file.full_path` | — |
-| `OriginalFileName` | `OriginalFileName` | `Processes.original_file_name` | `process.pe.original_file_name` | `process.pe.original_file_name` | `process.pe.original_file_name` | `ProcessVersionInfoOriginalFileName` | — | `OriginalFilename` | `target.process.file.names` | `target.process.file.names` | — |
-| `CommandLine` | `CommandLine` | `Processes.process` | `process.command_line` | `process.command_line` | `process.command_line` | `ProcessCommandLine` | `TargetProcessCommandLine` | `CommandLine` | `target.process.command_line` | `target.process.command_line` | — |
-| `ParentImage` | `ParentImage` | `Processes.parent_process_path` | `process.parent.executable.caseless` | `process.parent.executable.caseless` | `process.parent.executable.caseless` | `InitiatingProcessFolderPath` | `ParentProcessName`, `ActingProcessName` | `ParentBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — |
-| `ParentCommandLine` | `ParentCommandLine` | `Processes.parent_process` | `process.parent.command_line` | `process.parent.command_line` | `process.parent.command_line` | `InitiatingProcessCommandLine` | `ActingProcessCommandLine` | — | `principal.process.command_line` | `principal.process.command_line` | — |
-| `User` | `User` | `Processes.user` | `user.name` | `user.name` | `user.name` | `AccountName` | `TargetUsername` | `UserName` | `target.user.userid` | `target.user.userid` | `UserPrincipalName` |
-| `CurrentDirectory` | `CurrentDirectory` | `Processes.process_current_directory` | `process.working_directory` | `process.working_directory` | `process.working_directory` | — | `TargetProcessCurrentDirectory` | — | `target.process.file.full_path` | `target.process.file.full_path` | — |
-| `IntegrityLevel` | `IntegrityLevel` | `Processes.process_integrity_level` | `winlog.event_data.IntegrityLevel` | `winlog.event_data.IntegrityLevel` | `winlog.event_data.IntegrityLevel` | `ProcessIntegrityLevel` | `TargetProcessIntegrityLevel` | — | `target.process.integrity_level_rid` | `target.process.integrity_level_rid` | — |
-| `Hashes` | `Hashes` | — | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | — | — | `Hashes` | `hash` | `hash` | — |
-| `ProcessId` | `ProcessId` | `Processes.process_id` | `process.pid` | `process.pid` | `process.pid` | `ProcessId` | `TargetProcessId` | `RawProcessId` | `target.process.pid` | `target.process.pid` | — |
-| `ParentProcessId` | `ParentProcessId` | `Processes.parent_process_id` | `process.parent.pid` | `process.parent.pid` | `process.parent.pid` | `InitiatingProcessId` | `ParentProcessId`, `ActingProcessId` | — | `principal.process.pid` | `principal.process.pid` | — |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | `Processes.process_path` | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `FolderPath` | `TargetProcessName` | `ImageFileName` | `target.process.file.full_path` | `target.process.file.full_path` | — | `Image` | — | `Image` |
+| `OriginalFileName` | `OriginalFileName` | `Processes.original_file_name` | `process.pe.original_file_name` | `process.pe.original_file_name` | `process.pe.original_file_name` | `ProcessVersionInfoOriginalFileName` | — | `OriginalFilename` | `target.process.file.names` | `target.process.file.names` | — | `OriginalFileName` | — | `OriginalFileName` |
+| `CommandLine` | `CommandLine` | `Processes.process` | `process.command_line` | `process.command_line` | `process.command_line` | `ProcessCommandLine` | `TargetProcessCommandLine` | `CommandLine` | `target.process.command_line` | `target.process.command_line` | — | `CommandLine` | — | `CommandLine` |
+| `ParentImage` | `ParentImage` | `Processes.parent_process_path` | `process.parent.executable.caseless` | `process.parent.executable.caseless` | `process.parent.executable.caseless` | `InitiatingProcessFolderPath` | `ParentProcessName`, `ActingProcessName` | `ParentBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — | `ParentImage` | — | `ParentImage` |
+| `ParentCommandLine` | `ParentCommandLine` | `Processes.parent_process` | `process.parent.command_line` | `process.parent.command_line` | `process.parent.command_line` | `InitiatingProcessCommandLine` | `ActingProcessCommandLine` | — | `principal.process.command_line` | `principal.process.command_line` | — | `ParentCommandLine` | — | `ParentCommandLine` |
+| `User` | `User` | `Processes.user` | `user.name` | `user.name` | `user.name` | `AccountName` | `TargetUsername` | `UserName` | `target.user.userid` | `target.user.userid` | `UserPrincipalName` | `User` | — | `User` |
+| `CurrentDirectory` | `CurrentDirectory` | `Processes.process_current_directory` | `process.working_directory` | `process.working_directory` | `process.working_directory` | — | `TargetProcessCurrentDirectory` | — | `target.process.file.full_path` | `target.process.file.full_path` | — | `CurrentDirectory` | — | `CurrentDirectory` |
+| `IntegrityLevel` | `IntegrityLevel` | `Processes.process_integrity_level` | `winlog.event_data.IntegrityLevel` | `winlog.event_data.IntegrityLevel` | `winlog.event_data.IntegrityLevel` | `ProcessIntegrityLevel` | `TargetProcessIntegrityLevel` | — | `target.process.integrity_level_rid` | `target.process.integrity_level_rid` | — | `IntegrityLevel` | — | `IntegrityLevel` |
+| `Hashes` | `Hashes` | — | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | — | — | `Hashes` | `hash` | `hash` | — | `Hashes` | — | `Hashes` |
+| `ProcessId` | `ProcessId` | `Processes.process_id` | `process.pid` | `process.pid` | `process.pid` | `ProcessId` | `TargetProcessId` | `RawProcessId` | `target.process.pid` | `target.process.pid` | — | `ProcessId` | — | `ProcessId` |
+| `ParentProcessId` | `ParentProcessId` | `Processes.parent_process_id` | `process.parent.pid` | `process.parent.pid` | `process.parent.pid` | `InitiatingProcessId` | `ParentProcessId`, `ActingProcessId` | — | `principal.process.pid` | `principal.process.pid` | — | `ParentProcessId` | — | `ParentProcessId` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -37,20 +37,23 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "PROCESS_LAUNCH") AND (target.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: `SigninLogs | where UserPrincipalName contains "zzprobe"`
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>
 
 ## network_connection (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | — | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | `SrcProcessName`, `DstProcessName` | `ContextBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — |
-| `DestinationIp` | `DestinationIp` | — | `destination.ip` | `destination.ip` | `destination.ip` | `RemoteIP` | `DstIpAddr` | `RemoteAddressIP4` | `target.ip` | `target.ip` | — |
-| `DestinationPort` | `DestinationPort` | — | `destination.port` | `destination.port` | `destination.port` | `RemotePort` | `DstPortNumber` | `RemotePort` | `target.port` | `target.port` | — |
-| `DestinationHostname` | `DestinationHostname` | — | `destination.domain` | `destination.domain` | `destination.domain` | `RemoteUrl` | `DstHostname` | `DestinationHostname` | `target.hostname` | `target.hostname` | — |
-| `SourceIp` | `SourceIp` | — | `source.ip` | `source.ip` | `source.ip` | `LocalIP` | — | `SourceIp` | `principal.ip` | `principal.ip` | — |
-| `SourcePort` | `SourcePort` | — | `source.port` | `source.port` | `source.port` | `LocalPort` | `SrcPortNumber` | `LocalPort` | `principal.port` | `principal.port` | — |
-| `User` | `User` | — | `user.name` | `user.name` | `user.name` | `InitiatingProcessAccountName` | `SrcUsername`, `DstUsername` | `User` | `principal.user.userid` | `principal.user.userid` | `UserPrincipalName` |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | — | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | `SrcProcessName`, `DstProcessName` | `ContextBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — | `Image` | — | `Image` |
+| `DestinationIp` | `DestinationIp` | — | `destination.ip` | `destination.ip` | `destination.ip` | `RemoteIP` | `DstIpAddr` | `RemoteAddressIP4` | `target.ip` | `target.ip` | — | `DestinationIp` | — | `DestinationIp` |
+| `DestinationPort` | `DestinationPort` | — | `destination.port` | `destination.port` | `destination.port` | `RemotePort` | `DstPortNumber` | `RemotePort` | `target.port` | `target.port` | — | `DestinationPort` | `DestinationPort` | `DestinationPort` |
+| `DestinationHostname` | `DestinationHostname` | — | `destination.domain` | `destination.domain` | `destination.domain` | `RemoteUrl` | `DstHostname` | `DestinationHostname` | `target.hostname` | `target.hostname` | — | `DestinationHostname` | — | `DestinationHostname` |
+| `SourceIp` | `SourceIp` | — | `source.ip` | `source.ip` | `source.ip` | `LocalIP` | — | `SourceIp` | `principal.ip` | `principal.ip` | — | `SourceIp` | — | `SourceIp` |
+| `SourcePort` | `SourcePort` | — | `source.port` | `source.port` | `source.port` | `LocalPort` | `SrcPortNumber` | `LocalPort` | `principal.port` | `principal.port` | — | `SourcePort` | `SourcePort` | `SourcePort` |
+| `User` | `User` | — | `user.name` | `user.name` | `user.name` | `InitiatingProcessAccountName` | `SrcUsername`, `DstUsername` | `User` | `principal.user.userid` | `principal.user.userid` | `UserPrincipalName` | `User` | — | `User` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -65,16 +68,19 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "NETWORK_CONNECTION") AND (principal.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: `SigninLogs | where UserPrincipalName contains "zzprobe"`
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: `AWSCloudTrail | where DestinationPort contains "zzprobe"`
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>
 
 ## file_event (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | `Filesystem.process_path` | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | `TargetFilePath` | `Image` | `target.process.file.full_path` | `target.process.file.full_path` | — |
-| `TargetFilename` | `TargetFilename` | `Filesystem.file_path` | `file.path` | `file.path` | `file.path` | `FolderPath` | `TargetFileName` | `TargetFilename` | `target.file.names` | `target.file.names` | — |
-| `User` | `User` | — | `user.name` | `user.name` | `user.name` | `RequestAccountName` | `ActorUsername` | `User` | `principal.user.userid` | `principal.user.userid` | `UserPrincipalName` |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | `Filesystem.process_path` | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | `TargetFilePath` | `Image` | `target.process.file.full_path` | `target.process.file.full_path` | — | `Image` | — | `Image` |
+| `TargetFilename` | `TargetFilename` | `Filesystem.file_path` | `file.path` | `file.path` | `file.path` | `FolderPath` | `TargetFileName` | `TargetFilename` | `target.file.names` | `target.file.names` | — | `TargetFilename` | — | `TargetFilename` |
+| `User` | `User` | — | `user.name` | `user.name` | `user.name` | `RequestAccountName` | `ActorUsername` | `User` | `principal.user.userid` | `principal.user.userid` | `UserPrincipalName` | `User` | — | `User` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -89,17 +95,20 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "FILE_UNCATEGORIZED") AND (target.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: `SigninLogs | where UserPrincipalName contains "zzprobe"`
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>
 
 ## registry_set (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | `Registry.process_path` | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | `ActingProcessName` | `Image` | `principal.process.file.full_path` | `principal.process.file.full_path` | — |
-| `TargetObject` | `TargetObject` | `Registry.registry_key_name` | `registry.path` | `registry.path` | `registry.path` | `RegistryKey` | `RegistryKey` | `TargetObject` | `target.registry.registry_key` | `target.registry.registry_key` | — |
-| `Details` | `Details` | `Registry.registry_value_data` | `winlog.event_data.Details` | `winlog.event_data.Details` | `winlog.event_data.Details` | `RegistryValueData` | `RegistryValueData` | `Details` | `target.registry.registry_value_data` | `target.registry.registry_value_data` | — |
-| `EventType` | `EventType` | `Registry.action` | `winlog.event_data.EventType` | `winlog.event_data.EventType` | `winlog.event_data.EventType` | `ActionType` | `EventType` | `EventType` | `metadata.event_type` | `metadata.event_type` | — |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | `Registry.process_path` | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | `ActingProcessName` | `Image` | `principal.process.file.full_path` | `principal.process.file.full_path` | — | `Image` | — | `Image` |
+| `TargetObject` | `TargetObject` | `Registry.registry_key_name` | `registry.path` | `registry.path` | `registry.path` | `RegistryKey` | `RegistryKey` | `TargetObject` | `target.registry.registry_key` | `target.registry.registry_key` | — | `TargetObject` | — | `TargetObject` |
+| `Details` | `Details` | `Registry.registry_value_data` | `winlog.event_data.Details` | `winlog.event_data.Details` | `winlog.event_data.Details` | `RegistryValueData` | `RegistryValueData` | `Details` | `target.registry.registry_value_data` | `target.registry.registry_value_data` | — | `Details` | — | `Details` |
+| `EventType` | `EventType` | `Registry.action` | `winlog.event_data.EventType` | `winlog.event_data.EventType` | `winlog.event_data.EventType` | `ActionType` | `EventType` | `EventType` | `metadata.event_type` | `metadata.event_type` | — | `EventType` | — | `EventType` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -114,17 +123,20 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "REGISTRY_MODIFICATION") AND (principal.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: not supported for this logsource
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>
 
 ## image_load (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | — | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | — | `TargetImageFileName` | `target.process.file.full_path` | `target.process.file.full_path` | — |
-| `ImageLoaded` | `ImageLoaded` | — | `file.path` | `file.path` | `file.path` | `FolderPath` | — | `ImageFileName` | — | — | — |
-| `Signed` | `Signed` | — | `file.code_signature.signed` | `file.code_signature.signed` | `file.code_signature.signed` | — | — | — | — | — | — |
-| `Hashes` | `Hashes` | — | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | — | — | `Hashes` | `hash` | `hash` | — |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | — | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | `InitiatingProcessFolderPath` | — | `TargetImageFileName` | `target.process.file.full_path` | `target.process.file.full_path` | — | `Image` | — | `Image` |
+| `ImageLoaded` | `ImageLoaded` | — | `file.path` | `file.path` | `file.path` | `FolderPath` | — | `ImageFileName` | — | — | — | `ImageLoaded` | — | `ImageLoaded` |
+| `Signed` | `Signed` | — | `file.code_signature.signed` | `file.code_signature.signed` | `file.code_signature.signed` | — | — | — | — | — | — | `Signed` | — | `Signed` |
+| `Hashes` | `Hashes` | — | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | `winlog.event_data.Hashes` | — | — | `Hashes` | `hash` | `hash` | — | `Hashes` | — | `Hashes` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -139,15 +151,18 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "PROCESS_MODULE_LOAD") AND (target.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: not supported for this logsource
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>
 
 ## dns_query (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | — | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | — | — | `ContextBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — |
-| `QueryName` | `QueryName` | — | `dns.question.name` | `dns.question.name` | `dns.question.name` | — | — | `DomainName` | `network.dns.questions.name` | `network.dns.questions.name` | — |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | — | `process.executable.caseless` | `process.executable.caseless` | `process.executable.caseless` | — | — | `ContextBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — | `Image` | — | `Image` |
+| `QueryName` | `QueryName` | — | `dns.question.name` | `dns.question.name` | `dns.question.name` | — | — | `DomainName` | `network.dns.questions.name` | `network.dns.questions.name` | — | `QueryName` | — | `QueryName` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -162,14 +177,17 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "NETWORK_DNS") AND (principal.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: not supported for this logsource
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>
 
 ## ps_script (windows)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `ScriptBlockText` | `ScriptBlockText` | — | `powershell.file.script_block_text` | `powershell.file.script_block_text` | `powershell.file.script_block_text` | — | — | `CommandHistory`, `ScriptContent` | — | — | — |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `ScriptBlockText` | `ScriptBlockText` | — | `powershell.file.script_block_text` | `powershell.file.script_block_text` | `powershell.file.script_block_text` | — | — | `CommandHistory`, `ScriptContent` | — | — | — | `ScriptBlockText` | — | `ScriptBlockText` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -184,19 +202,22 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: not supported for this logsource
 - `secops_yaral`: not supported for this logsource
 - `sentinel_signin`: not supported for this logsource
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" ScriptBlockText="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND ScriptBlockText:*zzprobe*`
 
 </details>
 
 ## security (windows service)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `EventID` | `EventCode` | — | `event.code` | `event.code` | `event.code` | — | — | `EventID` | `metadata.product_event_type` | `metadata.product_event_type` | — |
-| `TargetUserName` | `TargetUserName` | — | `winlog.event_data.TargetUserName` | `winlog.event_data.TargetUserName` | `winlog.event_data.TargetUserName` | — | — | `TargetUserName` | `target.user.userid` | `target.user.userid` | `UserPrincipalName` |
-| `SubjectUserName` | `SubjectUserName` | — | `user.name` | `user.name` | `user.name` | — | — | `SubjectUserName` | `principal.user.userid` | `principal.user.userid` | — |
-| `LogonType` | `LogonType` | — | `winlog.event_data.LogonType` | `winlog.event_data.LogonType` | `winlog.event_data.LogonType` | — | — | `LogonType` | — | — | — |
-| `IpAddress` | `IpAddress` | — | `source.ip` | `source.ip` | `source.ip` | — | — | `IpAddress` | `ip` | `ip` | `IPAddress` |
-| `WorkstationName` | `WorkstationName` | — | `source.domain` | `source.domain` | `source.domain` | — | — | `WorkstationName` | `hostname` | `hostname` | — |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `EventID` | `EventCode` | — | `event.code` | `event.code` | `event.code` | — | — | `EventID` | `metadata.product_event_type` | `metadata.product_event_type` | — | `EventID` | — | `EventID` |
+| `TargetUserName` | `TargetUserName` | — | `winlog.event_data.TargetUserName` | `winlog.event_data.TargetUserName` | `winlog.event_data.TargetUserName` | — | — | `TargetUserName` | `target.user.userid` | `target.user.userid` | `UserPrincipalName` | `TargetUserName` | — | `TargetUserName` |
+| `SubjectUserName` | `SubjectUserName` | — | `user.name` | `user.name` | `user.name` | — | — | `SubjectUserName` | `principal.user.userid` | `principal.user.userid` | — | `SubjectUserName` | — | `SubjectUserName` |
+| `LogonType` | `LogonType` | — | `winlog.event_data.LogonType` | `winlog.event_data.LogonType` | `winlog.event_data.LogonType` | — | — | `LogonType` | — | — | — | `LogonType` | — | `LogonType` |
+| `IpAddress` | `IpAddress` | — | `source.ip` | `source.ip` | `source.ip` | — | — | `IpAddress` | `ip` | `ip` | `IPAddress` | `IpAddress` | — | `IpAddress` |
+| `WorkstationName` | `WorkstationName` | — | `source.domain` | `source.domain` | `source.domain` | — | — | `WorkstationName` | `hostname` | `hostname` | — | `WorkstationName` | — | `WorkstationName` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -211,17 +232,20 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `() AND (metadata.product_event_type = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: `SigninLogs | where UserPrincipalName contains "zzprobe"`
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" EventID="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND EventID:*zzprobe*`
 
 </details>
 
 ## process_creation (linux)
 
-| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `Image` | `Image` | `Processes.process_path` | `Image` | `Image` | `Image` | `FolderPath` | `TargetProcessName` | `ImageFileName` | `target.process.file.full_path` | `target.process.file.full_path` | — |
-| `CommandLine` | `CommandLine` | `Processes.process` | `CommandLine` | `CommandLine` | `CommandLine` | `ProcessCommandLine` | `TargetProcessCommandLine` | `CommandLine` | `target.process.command_line` | `target.process.command_line` | — |
-| `ParentImage` | `ParentImage` | `Processes.parent_process_path` | `ParentImage` | `ParentImage` | `ParentImage` | `InitiatingProcessFolderPath` | `ParentProcessName`, `ActingProcessName` | `ParentBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — |
-| `User` | `User` | `Processes.user` | `User` | `User` | `User` | `AccountName` | `TargetUsername` | `UserName` | `target.user.userid` | `target.user.userid` | `UserPrincipalName` |
+| Sigma field | splunk | splunk_cim | elastic_lucene | elastic_eql | elastic_esql | microsoft_xdr | sentinel_asim | crowdstrike_logscale | secops_udm | secops_yaral | sentinel_signin | splunk_cloudtrail | sentinel_cloudtrail | elastic_cloudtrail |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Image` | `Image` | `Processes.process_path` | `Image` | `Image` | `Image` | `FolderPath` | `TargetProcessName` | `ImageFileName` | `target.process.file.full_path` | `target.process.file.full_path` | — | `Image` | — | `Image` |
+| `CommandLine` | `CommandLine` | `Processes.process` | `CommandLine` | `CommandLine` | `CommandLine` | `ProcessCommandLine` | `TargetProcessCommandLine` | `CommandLine` | `target.process.command_line` | `target.process.command_line` | — | `CommandLine` | — | `CommandLine` |
+| `ParentImage` | `ParentImage` | `Processes.parent_process_path` | `ParentImage` | `ParentImage` | `ParentImage` | `InitiatingProcessFolderPath` | `ParentProcessName`, `ActingProcessName` | `ParentBaseFileName` | `principal.process.file.full_path` | `principal.process.file.full_path` | — | `ParentImage` | — | `ParentImage` |
+| `User` | `User` | `Processes.user` | `User` | `User` | `User` | `AccountName` | `TargetUsername` | `UserName` | `target.user.userid` | `target.user.userid` | `UserPrincipalName` | `User` | — | `User` |
 
 <details><summary>Data-source scoping each target adds (probe query)</summary>
 
@@ -236,5 +260,8 @@ Targets: `splunk` = Splunk SPL, `splunk_cim` = Splunk (CIM / tstats) SPL, `elast
 - `secops_udm`: `(metadata.event_type = "PROCESS_LAUNCH") AND (target.process.file.full_path = /zzprobe/ nocase)`
 - `secops_yaral`: YARA-L rule wrapper around the `secops_udm` predicate
 - `sentinel_signin`: `SigninLogs | where UserPrincipalName contains "zzprobe"`
+- `splunk_cloudtrail`: `sourcetype="aws:cloudtrail" Image="*zzprobe*"`
+- `sentinel_cloudtrail`: not supported for this logsource
+- `elastic_cloudtrail`: `event.dataset:aws.cloudtrail AND Image:*zzprobe*`
 
 </details>

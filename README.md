@@ -87,7 +87,13 @@ Optional: `pip install pre-commit && pre-commit install` runs the same gates on 
 
 ## SIEM targets
 
-`python -m dettools.translate --list` shows them. **Required** targets (`splunk`, `elastic_lucene`)
+`python -m dettools.translate --list` shows them. Targets are logsource-aware: Windows endpoint
+rules, Entra ID sign-in rules (`sentinel_signin`) and AWS CloudTrail rules (`splunk_cloudtrail`,
+`sentinel_cloudtrail`, `elastic_cloudtrail`) each compile only to the targets that can map their
+fields. CloudTrail rules use CloudTrail's own JSON field names (`eventName`, `userIdentity.type`);
+`dettools/targets.py` maps them to Sentinel `AWSCloudTrail` columns and Elastic ECS fields. Cloud
+rules are compiled to query files but not deployed by `dettools.deploy`.
+**Required** targets (`splunk`, `elastic_lucene`, and the per-logsource required targets)
 fail the build when a rule can't convert; the rest are best-effort and every gap is listed with
 its reason in `build/coverage.md` (also in the CI job summary). Caveats per target (e.g. ES|QL
 `like` is case-sensitive) are in `docs/siem/`. Excluded backends: SPL2 (wrong AND/OR grouping),

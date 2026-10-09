@@ -171,3 +171,17 @@ def test_compiled_esql_has_no_case_sensitive_string_match():
                 assert operand.startswith("to_lower("), f"{loaded.path.name}: {m.group(0)!r} in {query}"
         for m in re.finditer(r"\b(?:starts_with|ends_with)\((\S+)", code):
             assert m.group(1).lstrip("(").startswith("to_lower("), f"{loaded.path.name}: {m.group(0)!r}"
+
+
+def test_cloudtrail_targets_map_fields_per_siem():
+    # CloudTrail rules use CloudTrail's JSON names; each target must rewrite them to its schema
+    # and must not run on endpoint rules (and vice versa).
+    loaded = next(r for r in load_rules() if r.path.name == "aws_root_account_activity.yml")
+    applicable = {k for k, t in TARGETS.items() if t.applies_to(loaded.rule)}
+    assert applicable == {"splunk_cloudtrail", "sentinel_cloudtrail", "elastic_cloudtrail"}
+    kql = join_queries(convert(TARGETS["sentinel_cloudtrail"], loaded.rule))
+    assert kql.startswith("AWSCloudTrail") and "UserIdentityType" in kql and "EventTypeName" in kql
+    spl = join_queries(convert(TARGETS["splunk_cloudtrail"], loaded.rule))
+    assert spl.startswith('sourcetype="aws:cloudtrail"') and 'userIdentity.type="Root"' in spl
+    lucene = join_queries(convert(TARGETS["elastic_cloudtrail"], loaded.rule))
+    assert "event.dataset:aws.cloudtrail" in lucene and "aws.cloudtrail.user_identity.type:Root" in lucene
