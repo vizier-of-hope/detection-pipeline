@@ -103,6 +103,26 @@ Log Analytics custom table, then run the compiled query from
    the alert. The raw query is also in `build/queries/<target>/<rule>.<ext>` to paste into the
    SIEM search bar directly.
 
+## Beyond ART: full validation strategy
+
+ART only covers endpoint, single-event behaviour on one host. It cannot make cloud/identity
+logs appear, cannot reproduce multi-host network interaction or multi-stage chains, and does
+not measure a rule's false-positive rate. Use the right tool per rule class:
+
+| Rule class | Example in repo | Tool / method |
+|---|---|---|
+| Endpoint, single event | inveigh, runtimebroker, mitm6 (process launch) | **Atomic Red Team** (this doc) |
+| Cloud / identity | `signin_azure_aitm_token_theft_risk` | **[Stratus Red Team](https://github.com/DataDog/stratus-red-team)** (AWS/Azure/GCP/Entra), Microsoft Attack Simulation, or replay a `SigninLogs` record into Sentinel |
+| Network attack needing a victim | inveigh/mitm6 full poison->capture->relay chain | **Lab with a victim VM**, or **[CALDERA](https://github.com/mitre/caldera)** / **[PurpleSharp](https://github.com/mvelazc0/PurpleSharp)** for multi-host orchestration |
+| Multi-stage / correlation / APT emulation | (future correlation rules) | **CALDERA**, MITRE adversary emulation plans |
+| Catch-all variants (logic) | every rule | **`tests/test_rules.py` fixtures** — the only layer that runs every commit |
+| False-positive rate | every rule | Run the compiled query over **historical production logs** before enabling alerting |
+
+ART answers one question — "does the rule fire when this exact behaviour happens?" It does not
+prove the rule catches other variants of the technique (that is the true-negative/evasion
+fixtures' job) or that it is quiet in production (that is FP measurement). Treat live testing,
+fixtures, and FP measurement as three complementary legs, not substitutes.
+
 ## Promotion flow
 
 `experimental` (built, not shipped) -> validate logic (`pytest tests/test_rules.py`) ->
