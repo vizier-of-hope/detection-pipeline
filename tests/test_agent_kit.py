@@ -21,6 +21,14 @@ if not (KIT / "fixtures").exists():
     # Inside a run.py workspace the answers are removed on purpose; nothing to check here.
     pytest.skip("agent-tests fixtures not present", allow_module_level=True)
 
+# Some tests spin up a throwaway workspace that links the repo's own .venv; skip them where no
+# repo venv exists (CI / the pipeline Docker image install deps globally instead).
+_VENV_PY = REPO / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+requires_repo_venv = pytest.mark.skipif(
+    not _VENV_PY.exists(),
+    reason="needs the repo .venv linked into throwaway workspaces (absent in CI/Docker)",
+)
+
 READ_ONLY = {"Read", "Grep", "Glob", "WebFetch", "WebSearch"}
 REVIEW_AGENTS = {
     "AI-Generated Code Security Auditor", "Application Security Engineer", "Security Architect",
@@ -154,12 +162,14 @@ READONLY_CHECKS = {
 }
 
 
+@requires_repo_venv
 def test_runner_passes_a_well_behaved_read_only_agent(monkeypatch):
     runner = _load_runner()
     result = _fake_case(runner, "readonly_good", READONLY_CHECKS, monkeypatch)
     assert result["passed"], result["checks"]
 
 
+@requires_repo_venv
 def test_runner_catches_a_read_only_agent_that_writes(monkeypatch):
     runner = _load_runner()
     result = _fake_case(runner, "readonly_bad", READONLY_CHECKS, monkeypatch)
@@ -169,6 +179,7 @@ def test_runner_catches_a_read_only_agent_that_writes(monkeypatch):
     assert not (REPO / "soc2.md").exists(), "the fake must only ever write inside the workspace"
 
 
+@requires_repo_venv
 def test_runner_verifies_new_rule_logic_and_gates_in_the_workspace(monkeypatch):
     runner = _load_runner()
     spec = yaml.safe_load((KIT / "cases.yml").read_text(encoding="utf-8"))
@@ -179,6 +190,7 @@ def test_runner_verifies_new_rule_logic_and_gates_in_the_workspace(monkeypatch):
     assert not list((REPO / "rules").rglob("proc_creation_win_schtasks_users_public.yml"))
 
 
+@requires_repo_venv
 def test_workspace_cleanup_never_touches_the_real_venv():
     runner = _load_runner()
     work = runner.make_workspace({"id": "cleanup", "plant": []})

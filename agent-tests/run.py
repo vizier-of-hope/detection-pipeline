@@ -43,7 +43,7 @@ from sigma.rule import SigmaRule  # noqa: E402
 from dettools.evaluator import rule_matches  # noqa: E402
 
 PLANT_DIR = KIT / "fixtures" / "plant"
-COPY_IGNORE = shutil.ignore_patterns(".venv", "build", "reports", ".pytest_cache", "__pycache__", "results")
+COPY_IGNORE = shutil.ignore_patterns(".git", ".venv", "build", "reports", ".pytest_cache", "__pycache__", "results")
 SNAPSHOT_SKIP_DIRS = {".venv", "build", "reports", ".pytest_cache", "__pycache__", ".git"}
 VENV_PY = REPO / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
 AUTH_ERROR = re.compile(r"not logged in|please run /login|invalid api key", re.IGNORECASE)
