@@ -1,0 +1,65 @@
+name: Pipeline image
+
+# Builds the detection-pipeline Docker image, runs the full gate suite inside it (so the image
+# itself is proven healthy, not just the native CI), and publishes it to GitHub Container
+# Registry on main. Complements the native pip-based workflow in detections.yml.
+
+on:
+  pull_request:
+    paths:
+      - "Dockerfile"
+      - ".dockerignore"
+      - "docker/**"
+      - "requirements.txt"
+      - "rules/**"
+      - "tests/**"
+      - "dettools/**"
+      - ".github/workflows/docker-image.yml"
+  push:
+    branches: [main]
+    paths:
+      - "Dockerfile"
+      - ".dockerignore"
+      - "docker/**"
+      - "requirements.txt"
+      - "rules/**"
+      - "tests/**"
+      - "dettools/**"
+      - ".github/workflows/docker-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write  # push the image to ghcr.io on main
+
+concurrency:
+  group: docker-image-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  image:
+    name: Build image and run gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t detection-pipeline:ci .
+
+      - name: Run full gate suite inside the container
+        run: docker run --rm detection-pipeline:ci
+
+      # Publish only on a push to main; PRs build-and-test but never publish.
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Tag and push image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          image=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          docker tag detection-pipeline:ci "$image:latest"
+          docker tag detection-pipeline:ci "$image:${{ github.sha }}"
+          docker push "$image:latest"
+          docker push "$image:${{ github.sha }}"
+          echo "Published \`$image:latest\` and \`$image:${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
